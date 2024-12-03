@@ -4,14 +4,17 @@ const App = () => {
     const [todos, setTodos] = useState([]);
     const [newTodo, setNewTodo] = useState('');
 
+    // Base URL desde la variable de entorno
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
     useEffect(() => {
-        fetch('/api/todos')
+        fetch(`${backendUrl}/api/todos`)
             .then((response) => response.json())
             .then((data) => setTodos(data));
-    }, []);
+    }, [backendUrl]);
 
     const addTodo = () => {
-        fetch('/api/todos', {
+        fetch(`${backendUrl}/api/todos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title: newTodo, completed: false }),
@@ -22,14 +25,10 @@ const App = () => {
     };
 
     const deleteTodo = (id) => {
-        fetch(`/api/todos/${id}`, {
+        fetch(`${backendUrl}/api/todos/${id}`, {
             method: 'DELETE',
         })
-            .then(() => {
-                // Filtrar la tarea eliminada del estado
-                setTodos(todos.filter((todo) => todo.id !== id));
-            })
-            .catch((error) => console.error('Error deleting todo:', error));
+            .then(() => setTodos(todos.filter((todo) => todo.id !== id)));
     };
 
     return (
@@ -39,9 +38,7 @@ const App = () => {
                 {todos.map((todo) => (
                     <li key={todo.id}>
                         {todo.title}{' '}
-                        <button onClick={() => deleteTodo(todo.id)}>
-                            Delete
-                        </button>
+                        <button onClick={() => deleteTodo(todo.id)}>Delete</button>
                     </li>
                 ))}
             </ul>
